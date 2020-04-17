@@ -178,7 +178,7 @@ def scan_extractor(path, vectors=False):
     return paragraph_repo
 
 
-def get_text(path):
+def get_content(path):
     if path.endswith(".pptx") or path.endswith(".ppt"):
         try:
             text = ppt_extractor(path)
