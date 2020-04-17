@@ -1,5 +1,5 @@
-from __future__ import print_function
 import re
+import os
 import zipfile
 import pandas as pd
 try:
@@ -12,6 +12,7 @@ from pdfminer.pdfpage import PDFPage
 from pdfminer.layout import LAParams
 from pdf2image import convert_from_path
 from pytesseract import image_to_string
+from Preprocessing.beautify import fix_text
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 WORD_NAMESPACE = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
@@ -25,7 +26,7 @@ def docx_extractor(path, vectors=False):
     document.close()
     tree = XML(xml_content)
     doc = {}
-    vector = {}
+    # vector = {}
     paragraph_nb = 1
     for paragraph in tree.getiterator(PARA):
         texts = None
@@ -36,40 +37,66 @@ def docx_extractor(path, vectors=False):
         if texts:
             text = ''.join(texts)
             doc[str(paragraph_nb)] = fix_text(text)
-            if vectors:
-                vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
-            else:
-                pass
+#            if vectors:
+#                vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
+#            else:
+#                pass
             paragraph_nb += 1
 
-    if vectors:
-        return creator, doc, vector
+#    if vectors:
+#        return creator, doc, vector
     else:
-        return creator, doc
+        return doc
 
 
 def ppt_extractor(path):
+    paragraph_repo = {}
+    # vector = {}
     f = open(path, "rb")
     prs = Presentation(f)
-    s = ''
+    slide_nb = 0
     for slide in prs.slides:
-        for shape in slide.shapes:
-            if hasattr(shape, "text") and shape.text.strip():
-                s += str("new" + shape.text)
 
-    return s
+        slide_nb += 1
+        temp_text = ''
+
+        for shape in slide.shapes:
+
+            if hasattr(shape, "text") and shape.text.strip():
+                temp_text += shape.text
+
+        paragraph_repo[str(slide_nb)] = fix_text(temp_text)
+        # if vectors:
+        #     vector[str(slide_nb)] = vectorizer(temp_text, lang=detect(text))
+        # else:
+        #     pass
+
+    # if vectors:
+    #     return creator, paragraph_repo, vector
+    # else:
+    return paragraph_repo
 
 
 def txt_extractor(path):
-    s = ""
+    doc = {}
+    # vector = {}
+    paragraph_nb = 1
+
     with open(path) as f:
         lines = f.read()
 
     texts = lines.strip().split("/n/n")
     for text in texts:
-        s += str("new" + text)
+        doc[str(paragraph_nb)] = fix_text(text)
+        # if vectors:
+        #     vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
+        # else:
+        paragraph_nb += 1
 
-    return s
+    # if vectors:
+    #     return doc, vector
+    # else:
+    return doc
 
 
 def pdf_extractor(path):
@@ -83,7 +110,12 @@ def pdf_extractor(path):
     maxpages = 0
     caching = True
     pagenos = set()
-    s = ""
+    creator = "Unknown"
+
+    current_page_number = 1
+    paragraph_repo = {}
+    # vector = {}
+    Classified = False
 
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
@@ -93,37 +125,57 @@ def pdf_extractor(path):
         text = retstr.getvalue()
         retstr.truncate(0)
         text = re.sub(u'(\u0000)', "", text)
-        s += str("new" + text)
+        paragraph_repo[str(current_page_number)] = text
+        # if vectors:
+        #     vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
+        # else:
+        #     pass
+        current_page_number += 1
 
     fp.close()
     device.close()
     retstr.close()
-
-    return s
-
-
-def excel_extractor(path):
-    OrderedDic = pd.read_excel(path, sheet_name=None)
-    Dic = dict(OrderedDic)
-    s = ""
-    for k, v in Dic.items():
-        if v:
-            s += str("new" + v)
-        else:
-            pass
-
-    return s
+    # if vectors:
+    #     return Classified, creator, paragraph_repo, vector
+    # else:
+    return Classified, creator, paragraph_repo
 
 
-def scan_extractor(path):
+def table_extractor(path):
+    Dic = {}
+    filename = os.path.basename(path)
+    if filename.endswith(".xlsx") or filename.endswith(".xls"):
+        OrderedDic = pd.read_excel(path, sheet_name=None)
+        Dic = dict(OrderedDic)
+    elif filename.endswith(".csv"):
+        table = pd.read_csv(path, index_col=0)
+        Dic["single_table"] = table
+    else:
+        table = pd.read_table(path)
+        Dic["single_table"] = table
+
+    return Dic
+
+
+def scan_extractor(path, vectors=False):
     pages = convert_from_path(path, 500)
-    s = ""
+    paragraph_repo = {}
+    # vector = {}
+    current_page_number = 1
 
     for page in pages:
+        text = ''
         text = image_to_string(page)
-        s += str("new" + text)
+        paragraph_repo[str(current_page_number)] = text
 
-    return s
+        # if vectors:
+        #     vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
+
+    # if vectors:
+    #     return paragraph_repo, vector
+    #
+    # else:
+    return paragraph_repo
 
 
 def get_text(path):
