@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import zipfile
 try:
     from xml.etree.cElementTree import XML
@@ -165,11 +166,23 @@ def pdf_metadata(path):
     return metadata
 
 
+def misc_metadata(path):
+    metadata = {}
+    metadata['Title'] = os.path.basename(path)
+    metadata['Author(s)'] = "Unknown"
+    metadata['Last Modified By'] = "Unknown"
+    metadata['Created Date'] = time.ctime(os.path.getmtime(path))
+    metadata['Modified Date'] = time.ctime(os.path.getctime(path))
+
+    return metadata
+
+
 def get_meta(path):
     filename = os.path.basename(path)
     if filename.endswith('.pdf'):
         temp = pdf_metadata(path)
-
+    elif filename.endswith(".csv"):
+        temp = misc_metadata(path)
     else:
         temp = msoffice_metadata(path)
     return temp

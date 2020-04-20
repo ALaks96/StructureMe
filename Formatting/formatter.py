@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 def get_arbo(root):
-    valid_ext = ["docx","pptx",'xlsx',"pdf"]
+    valid_ext = ["docx","pptx",'xlsx',"pdf","csv"]
     paths = []
     for path, subdirs, files in os.walk(root):
         for name in files:
