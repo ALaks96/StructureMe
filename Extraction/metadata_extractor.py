@@ -168,13 +168,8 @@ def pdf_metadata(path):
 def get_meta(path):
     filename = os.path.basename(path)
     if filename.endswith('.pdf'):
-        try:
-            temp = pdf_metadata(path)
-        except Exception as e:
-            print(e)
+        temp = pdf_metadata(path)
+
     else:
-        try:
-            temp = msoffice_metadata(path)
-        except Exception as e:
-            print(e)
+        temp = msoffice_metadata(path)
     return temp

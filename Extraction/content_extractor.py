@@ -29,8 +29,6 @@ def docx_extractor(path, vectors=False):
     # vector = {}
     paragraph_nb = 1
     for paragraph in tree.getiterator(PARA):
-        texts = None
-        text = ""
         texts = [node.text
                  for node in paragraph.getiterator(TEXT)
                  if node.text]
@@ -110,12 +108,9 @@ def pdf_extractor(path):
     maxpages = 0
     caching = True
     pagenos = set()
-    creator = "Unknown"
-
     current_page_number = 1
     paragraph_repo = {}
     # vector = {}
-    Classified = False
 
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
@@ -138,7 +133,7 @@ def pdf_extractor(path):
     # if vectors:
     #     return Classified, creator, paragraph_repo, vector
     # else:
-    return Classified, creator, paragraph_repo
+    return paragraph_repo
 
 
 def table_extractor(path):
@@ -147,6 +142,8 @@ def table_extractor(path):
     if filename.endswith(".xlsx") or filename.endswith(".xls"):
         OrderedDic = pd.read_excel(path, sheet_name=None)
         Dic = dict(OrderedDic)
+        for k,v in Dic.items():
+            Dic[k] = Dic[k].to_json()
     elif filename.endswith(".csv"):
         table = pd.read_csv(path, index_col=0)
         Dic["single_table"] = table
@@ -164,7 +161,6 @@ def scan_extractor(path, vectors=False):
     current_page_number = 1
 
     for page in pages:
-        text = ''
         text = image_to_string(page)
         paragraph_repo[str(current_page_number)] = text
 
@@ -179,41 +175,49 @@ def scan_extractor(path, vectors=False):
 
 
 def get_content(path):
+    text = {}
+    print(path)
     if path.endswith(".pptx") or path.endswith(".ppt"):
-        try:
-            text = ppt_extractor(path)
-        except Exception as e:
-            print(e)
-            pass
+        # try:
+        text = ppt_extractor(path)
+        # except Exception as e:
+        #     print(e)
+        #     pass
 
     elif path.endswith(".pdf"):
-        try:
-            text = pdf_extractor(path)
-        except Exception as e:
-            print(e)
-            try:
-                text = scan_extractor(path)
-            except Exception as ee:
-                print(ee)
-                pass
+
+        # try:
+        text = pdf_extractor(path)
+        # except Exception as e:
+        #     print(e)
+        #     try:
+        #         text = scan_extractor(path)
+        #     except Exception as ee:
+        #         print(ee)
+        #         pass
 
     elif path.endswith(".docx"):
-        try:
-            text = docx_extractor(path)
-        except Exception as e:
-            print(e)
-            pass
+
+        # try:
+        text = docx_extractor(path)
+        # except Exception as e:
+        #     print(e)
+        #     pass
 
     elif path.endswith(".txt"):
-        try:
-            text = txt_extractor(path)
-        except Exception as e:
-            print(e)
-            pass
+
+        # try:
+        text = txt_extractor(path)
+        # except Exception as e:
+        #     print(e)
+        #     pass
 
     elif path.endswith(".xls") or path.endswith(".xlsx"):
-        try:
-            text = excel_extractor(path)
-        except Exception as e:
-            print(e)
+
+        # try:
+        text = table_extractor(path)
+        # except Exception as e:
+        #     print(e)
+    else:
+        pass
     return text
