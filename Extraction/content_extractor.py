@@ -120,7 +120,7 @@ def pdf_extractor(path):
         text = retstr.getvalue()
         retstr.truncate(0)
         text = re.sub(u'(\u0000)', "", text)
-        paragraph_repo[str(current_page_number)] = text
+        paragraph_repo[str(current_page_number)] = fix_text(text)
         # if vectors:
         #     vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
         # else:
@@ -144,9 +144,9 @@ def table_extractor(path):
         Dic = dict(OrderedDic)
         for k,v in Dic.items():
             Dic[k] = Dic[k].to_json()
-    elif filename.endswith(".csv"):
-        table = pd.read_csv(path, index_col=0)
-        Dic["single_table"] = table
+    elif filename.endswith("csv"):
+        table = pd.read_csv(path, encoding='utf-8')
+        Dic["single_table"] = table.to_dict('index')
     else:
         table = pd.read_table(path)
         Dic["single_table"] = table
@@ -212,7 +212,9 @@ def get_content(path):
         #     print(e)
         #     pass
 
-    elif path.endswith(".xls") or path.endswith(".xlsx"):
+    elif path.endswith(".xls")\
+            or path.endswith(".xlsx")\
+            or path.endswith(".csv"):
 
         # try:
         text = table_extractor(path)

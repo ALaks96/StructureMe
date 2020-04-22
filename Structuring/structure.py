@@ -1,9 +1,9 @@
 from __future__ import print_function
-import os
 from Extraction.metadata_extractor import get_meta
 from Extraction.content_extractor import get_content
 from Formatting.formatter import get_arbo
 from Formatting.formatter import to_json
+from Formatting.formatter import validateJSON
 
 
 def structure_me(path, save=True, json_name="Output/scan.json"):

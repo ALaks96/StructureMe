@@ -5,13 +5,21 @@ from datetime import datetime
 
 
 def get_arbo(root):
-    valid_ext = ["docx","pptx",'xlsx',"pdf","csv"]
+    valid_ext = ["ppt","pptx","docx","pdf","csv"]
     paths = []
     for path, subdirs, files in os.walk(root):
         for name in files:
             if name.endswith(tuple(valid_ext)):
                 paths.append(os.path.join(path, name))
     return paths
+
+
+def validateJSON(jsonData):
+    try:
+        json.loads(jsonData)
+    except ValueError as err:
+        return False
+    return True
 
 
 class DateTimeEncoder(json.JSONEncoder):

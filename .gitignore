@@ -10,6 +10,8 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+ImageTextRecognition/
+ScanDetect/
 .Python
 build/
 develop-eggs/
