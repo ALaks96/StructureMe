@@ -3,10 +3,10 @@ from Extraction.metadata_extractor import get_meta
 from Extraction.content_extractor import get_content
 from Formatting.formatter import get_arbo
 from Formatting.formatter import to_json
-from Formatting.formatter import validateJSON
+from Summarization.summarizer import summarize
 
 
-def structure_me(path, save=True, json_name="Output/scan.json"):
+def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None):
     print("#####################")
     print("SCAN STARTED")
     # Initiate mega dic containing everything
@@ -35,9 +35,14 @@ def structure_me(path, save=True, json_name="Output/scan.json"):
         dic_of_files['created_date'] = meta['Created Date']
         dic_of_files['modified_date'] = meta['Modified Date']
         dic_of_files['location'] = file
-        dic_of_files['content'] = get_content(file)
+        dic_of_files['content'], raw, file_type = get_content(file)
+        if file.endswith("pdf"):
+            print(raw)
         print("-----------------------")
         print("Got content")
+        dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr)
+        print("-----------------------")
+        print("Got summary")
         # And assign all of this to our megadic, indexed by incremental numbers!
         megadic[int(index)] = dic_of_files
         print("-----------------------")
@@ -47,8 +52,8 @@ def structure_me(path, save=True, json_name="Output/scan.json"):
         #     print("ERROR::", e, ':', os.path.basename(file))
     print("SCAN FINISHED")
     print("#####################")
-    print(megadic)
-
+    for k,v in megadic.items():
+        print(megadic[k]['summary'])
 
     if save:
         to_json(megadic, json_name)

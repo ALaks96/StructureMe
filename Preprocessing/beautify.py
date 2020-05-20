@@ -13,6 +13,7 @@ def correct_ascii(text):
 def fix_text(text):
     text = text.replace("\n", " ")
     text = text.replace("\t", " ")
+    text = text.replace("\x0c", "")
     text = text.replace("\u2013", "-")
     text = text.replace("\u03d5", "ϕ")
     text = text.rstrip("\n")

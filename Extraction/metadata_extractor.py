@@ -42,11 +42,11 @@ def decoder(element):
 
 
 def msoffice_metadata(path):
+    metadata = {}
     if zipfile.is_zipfile(path):
         zfile = zipfile.ZipFile(path)
         core_xml = etree.fromstring(zfile.read('docProps/core.xml'))
         app_xml = etree.fromstring(zfile.read('docProps/app.xml'))
-        metadata = {}
         metadata['Title'] = os.path.basename(path)
         valid_name = ['Author(s)', 'Created Date', 'Modified Date', 'Last Modified By']
 
@@ -178,11 +178,12 @@ def misc_metadata(path):
 
 
 def get_meta(path):
+    MSoffice = [".pptx", ".ppt", ".docx", ".xls", ".xlsx"]
     filename = os.path.basename(path)
     if filename.endswith('.pdf'):
         temp = pdf_metadata(path)
-    elif filename.endswith(".csv"):
-        temp = misc_metadata(path)
-    else:
+    elif filename.endswith(tuple(MSoffice)):
         temp = msoffice_metadata(path)
+    else:
+        temp = misc_metadata(path)
     return temp

@@ -2,10 +2,15 @@ import os
 import json
 import pandas as pd
 from datetime import datetime
-
+from django.core.serializers.json import DjangoJSONEncoder
 
 def get_arbo(root):
-    valid_ext = ["ppt","pptx","docx","pdf","csv"]
+    valid_ext = [
+                 #"ppt","pptx","docx","xlsx","xls",
+                 "pdf"
+                 #"csv","tsv",
+                 #"jpeg","jpg","png"
+                 ]
     paths = []
     for path, subdirs, files in os.walk(root):
         for name in files:
@@ -37,7 +42,7 @@ def jsonKeys2int(x):
 
 
 def to_json(dic, file_name="metadata.json"):
-    js = json.dumps(dic, indent=1, cls=DateTimeEncoder)
+    js = json.dumps(dic, indent=1, default=str)
 
     # Open new json file if not exist it will create
     fp = open(os.getcwd() + "/" + str(file_name), 'w')
