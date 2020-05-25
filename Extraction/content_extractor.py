@@ -166,10 +166,9 @@ def excel_extractor(path):
     filename = os.path.basename(path)
     if filename.endswith(".xlsx") or filename.endswith(".xls"):
         table = pd.read_excel(path, sheet_name=None)
-        table = table.replace({np.nan: None})
-        Dic = dict(table)
-        for k,v in Dic.items():
-            Dic[k] = Dic[k].to_json()
+        for k in table.keys():
+            table[k] = table[k].replace({np.nan: None})
+            Dic[k] = table[k].to_dict(orient='records')
 
     return Dic, table
 
@@ -201,7 +200,7 @@ def scan_extractor(path):
 
     # Counter to store images of each page of PDF to image
     image_counter = 1
-
+    photos = []
     # Iterate through all the pages stored above
     for page in pages:
         # Declaring filename for each page of PDF as JPG
@@ -212,6 +211,7 @@ def scan_extractor(path):
         # ....
         # PDF page n -> page_n.jpg
         filename = "page_" + str(image_counter) + ".jpg"
+        photos.append(filename)
 
         # Save the image of the page in system
         page.save(filename, 'JPEG')
@@ -250,6 +250,9 @@ def scan_extractor(path):
         text = fix_text(text.replace('-\n', ''))
         paragraph_repo[str(i)] = text
         s += text
+
+    for file in photos:
+        os.remove(file)
 
     return paragraph_repo, s
 

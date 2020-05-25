@@ -2,15 +2,16 @@ import os
 import json
 import pandas as pd
 from datetime import datetime
-from django.core.serializers.json import DjangoJSONEncoder
+
 
 def get_arbo(root):
     valid_ext = [
-                 #"ppt","pptx","docx","xlsx","xls",
-                 #"pdf",
-                 #"csv","tsv",
-                 "jpeg","jpg","png"
-                 ]
+        "ppt", "pptx", "docx", "xlsx", "xls",
+        "pdf",
+        "txt",
+        "csv", "tsv",
+        "jpeg", "jpg", "png"
+    ]
     paths = []
     for path, subdirs, files in os.walk(root):
         for name in files:
@@ -22,7 +23,7 @@ def get_arbo(root):
 def validateJSON(jsonData):
     try:
         json.loads(jsonData)
-    except ValueError as err:
+    except ValueError:
         return False
     return True
 
@@ -37,7 +38,7 @@ class DateTimeEncoder(json.JSONEncoder):
 
 def jsonKeys2int(x):
     if isinstance(x, dict):
-            return {int(k) : v for k, v in x.items()}
+        return {int(k): v for k, v in x.items()}
     return x
 
 

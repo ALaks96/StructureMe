@@ -8,7 +8,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+/.idea
 # Distribution / packaging
 ImageTextRecognition/
 ScanDetect/
@@ -127,3 +127,48 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+.idea/StructureMe.iml
+.idea/encodings.xml
+.idea/inspectionProfiles/
+.idea/libraries/
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+Data/1030_conservationdog-1028x579.png
+Data/Attestation sur l'honneur.pdf
+Data/BCG.docx
+Data/BUDGET.xlsx
+Data/Case 3 - Pricing Strategy - Dataset.xlsx
+Data/case3_data.csv
+Data/images.jpg
+Data/photo.png
+Data/some_sub_dir/Attestation_Modalite_exams.pdf
+Data/some_sub_dir/CV Alexis Laks.docx
+Data/some_sub_dir/Masterclass DISummit 1 hour.pptx
+Data/some_sub_dir/Rapport de Stage.pdf
+Data/some_sub_dir/cv_alexis_laks.pdf
+Data/some_sub_dir/ethics&data_alexis_laks.docx
+Data/test.txt
+Output/
+Troubleshooting/Attestation sur l'honneur.jpeg
+Troubleshooting/Attestation sur l'honneur.pdf
+Troubleshooting/Attestation_Modalite_exams.pdf
+Troubleshooting/BUDGET.xlsx
+Troubleshooting/CV Alexis Laks.docx
+Troubleshooting/Case 3 - Pricing Strategy - Dataset.xlsx
+Troubleshooting/ID.jpeg
+Troubleshooting/Rapport de Stage.pdf
+Troubleshooting/case3_data.csv
+Troubleshooting/cv_alexis_laks.pdf
+Troubleshooting/ethics&data_alexis_laks.docx
+Troubleshooting/out_text.txt
+Troubleshooting/page_1.jpg
+Troubleshooting/scan.json
+Troubleshooting/some_sub_dir/Attestation_Modalite_exams.pdf
+Troubleshooting/some_sub_dir/CV Alexis Laks.docx
+Troubleshooting/some_sub_dir/Rapport de Stage.pdf
+Troubleshooting/some_sub_dir/cv_alexis_laks.pdf
+Troubleshooting/some_sub_dir/ethics&data_alexis_laks.docx
+Troubleshooting/test.jpeg
+Troubleshooting/troubleshooter.ipynb
+page_1.jpg
