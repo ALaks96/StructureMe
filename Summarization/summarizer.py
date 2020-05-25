@@ -41,12 +41,12 @@ def table_summary(table):
     return summ
 
 
-def summarize(raw, file_type, model_en, model_fr):
+def summarize(raw, file_type, model_en, model_fr, filepath):
     summ = {}
     if file_type == 'txt':
         summ["text_contents"] = text_summary(raw, model_en, model_fr)
     elif file_type == 'img':
-        summ["photo_subjects"] = image_detect(raw)
+        summ["photo_subjects"] = image_detect(filepath)
     elif file_type == "sheets":
         for k in raw.keys():
             summ[k] = table_summary(raw[k])

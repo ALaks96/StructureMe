@@ -40,7 +40,7 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
         #     print(raw)
         print("-----------------------")
         print("Got content")
-        dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr)
+        dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr, filepath=file)
         print("-----------------------")
         print("Got summary")
         # And assign all of this to our megadic, indexed by incremental numbers!

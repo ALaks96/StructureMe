@@ -7,17 +7,16 @@ model_path = os.getcwd() + "/Summarization/objectDetection/models/yolo-tiny.h5"
 output_path = os.getcwd() + "/Summarization/objectDetection/output/newimage.jpg"
 
 
-def image_detect(path):
+def image_detect(path, model=model_path):
     summ = {}
-    contents = []
     detector = ObjectDetection()
     detector.setModelTypeAsTinyYOLOv3()
-    detector.setModelPath(model_path)
+    detector.setModelPath(model)
     detector.loadModel()
 
-    detection = detector.detectObjectsFromImage(input_image=path, input_type="array", output_image_path=output_path)
-
+    detection = detector.detectObjectsFromImage(input_image=path, output_image_path=output_path)
+    i = 0
     for eachItem in detection:
-        contents.append(str(eachItem["name"] + " : " + round(eachItem["percentage_probability"])) + "%")
-    summ["contents"] = contents
+        summ[str("element " + str(i) + " " + str(eachItem["name"]))] = str(round(eachItem["percentage_probability"])) + "%"
+        i += 1
     return summ
