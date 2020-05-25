@@ -36,8 +36,8 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
         dic_of_files['modified_date'] = meta['Modified Date']
         dic_of_files['location'] = file
         dic_of_files['content'], raw, file_type = get_content(file)
-        if file.endswith("pdf"):
-            print(raw)
+        # if file.endswith("pdf"):
+        #     print(raw)
         print("-----------------------")
         print("Got content")
         dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr)
@@ -52,8 +52,8 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
         #     print("ERROR::", e, ':', os.path.basename(file))
     print("SCAN FINISHED")
     print("#####################")
-    for k,v in megadic.items():
-        print(megadic[k]['summary'])
+    # for k,v in megadic.items():
+    #     print(megadic[k]['summary'])
 
     if save:
         to_json(megadic, json_name)

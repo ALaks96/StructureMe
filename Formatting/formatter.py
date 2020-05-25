@@ -7,9 +7,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 def get_arbo(root):
     valid_ext = [
                  #"ppt","pptx","docx","xlsx","xls",
-                 "pdf"
+                 #"pdf",
                  #"csv","tsv",
-                 #"jpeg","jpg","png"
+                 "jpeg","jpg","png"
                  ]
     paths = []
     for path, subdirs, files in os.walk(root):

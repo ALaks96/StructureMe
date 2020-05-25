@@ -3,6 +3,7 @@ import os
 import cv2
 import zipfile
 import pytesseract
+import numpy as np
 import pandas as pd
 from PIL import Image
 
@@ -165,6 +166,7 @@ def excel_extractor(path):
     filename = os.path.basename(path)
     if filename.endswith(".xlsx") or filename.endswith(".xls"):
         table = pd.read_excel(path, sheet_name=None)
+        table = table.replace({np.nan: None})
         Dic = dict(table)
         for k,v in Dic.items():
             Dic[k] = Dic[k].to_json()
@@ -175,11 +177,17 @@ def excel_extractor(path):
 def table_extractor(path):
     Dic = {}
     filename = os.path.basename(path)
-    if filename.endswith("csv"):
+    if filename.endswith("csv") or filename.endswith("tsv"):
         table = pd.read_csv(path, encoding='utf-8')
+        if table.columns[0] == 'Unnamed: 0':
+            del table['Unnamed: 0']
+        table = table.replace({np.nan: None})
         Dic["single_table"] = table.to_dict('index')
     else:
         table = pd.read_table(path)
+        if table.columns[0] == 'Unnamed: 0':
+            del table['Unnamed: 0']
+        table = table.replace({np.nan: None})
         Dic["single_table"] = table
 
     return Dic, table

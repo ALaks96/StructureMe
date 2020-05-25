@@ -12,5 +12,5 @@ try:
 except OSError:
     print("run this in your terminal: python -m spacy download en_core_web_sm")
 
-root = "/Users/laks/Desktop/Coding/DealSumm/Exemple de contrat/"
+root = os.getcwd() + "/Data/"
 structure_me(root, en=nlp_en, fr=nlp_fr)

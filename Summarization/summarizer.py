@@ -5,6 +5,7 @@ from Summarization.objectDetection.detector import image_detect
 
 
 def text_summary(text, model_en, model_fr):
+    summ =  {}
     tr = pytextrank.TextRank()
     nlp_en = model_en
     nlp_fr = model_fr
@@ -23,8 +24,9 @@ def text_summary(text, model_en, model_fr):
         doc = nlp_fr(text)
 
     tags = doc._.phrases[0:21]
+    summ["tags"] = tags
 
-    return dict(tags)
+    return summ
 
 
 def table_summary(table):
@@ -40,17 +42,15 @@ def table_summary(table):
 
 
 def summarize(raw, file_type, model_en, model_fr):
+    summ = {}
     if file_type == 'txt':
-        summ = text_summary(raw, model_en, model_fr)
-    elif file_type == "table":
-        summ = table_summary(raw)
+        summ["text_contents"] = text_summary(raw, model_en, model_fr)
     elif file_type == 'img':
-        summ = {}
-        summ["photo_subject"] = image_detect(raw)
-    else:
-        summ = []
+        summ["photo_subjects"] = image_detect(raw)
+    elif file_type == "sheets":
         for k in raw.keys():
-            print(k)
-            summ.append(table_summary(raw[k]))
+            summ[k] = table_summary(raw[k])
+    elif file_type == "table":
+        summ["table_contents"] = table_summary(raw)
 
     return summ
