@@ -14,6 +14,7 @@ from pdfminer.pdfdocument import PDFDocument
 
 
 def posix_from_s(element):
+    # General purpose function to convert wierdly typed date fromats to json readable posix
     year = element[2:6]
     month = element[6:8]
     day = element[8:10]
@@ -26,6 +27,7 @@ def posix_from_s(element):
 
 
 def decoder(element):
+    # General purpose function to fix encoding problems like replacing accents with non accented character
     try:
         decoded = element.decode("utf-8")
         decoded = re.sub('\x00', "", decoded)
@@ -42,15 +44,18 @@ def decoder(element):
 
 
 def msoffice_metadata(path):
+    # Function to extract metadata for any type of MSOffice file, metadata can be found in the xml structure of the
+    # zipfile (the msoffice file) alongside its content
     metadata = {}
     if zipfile.is_zipfile(path):
         zfile = zipfile.ZipFile(path)
         core_xml = etree.fromstring(zfile.read('docProps/core.xml'))
         app_xml = etree.fromstring(zfile.read('docProps/app.xml'))
         metadata['Title'] = os.path.basename(path)
+        # Retrieve only the below information
         valid_name = ['Author(s)', 'Created Date', 'Modified Date', 'Last Modified By']
 
-        # Key elements
+        # Key elements (Optional additional elements)
         core_mapping = {
             'title': 'Title',
             'subject': 'Subject',
@@ -64,18 +69,22 @@ def msoffice_metadata(path):
             'contentStatus': 'Status',
             'revision': 'Revision'
         }
+        # Loop through every element of the metadata node within the MSOffice file's xml
         for element in core_xml.getchildren():
             for key, title in core_mapping.items():
+                # If element in metadata node corresponds to one of the elements defined in core_mapping, retrieve it
                 if key in element.tag:
+                    # If element corresponds to a date, convert properly
                     if 'date' in title.lower():
                         text = dt.strptime(element.text, "%Y-%m-%dT%H:%M:%SZ")
+                    # Otherwise treat it like any other text element
                     else:
                         text = element.text
-                    print("{}: {}".format(title, text))
+                    # Final check to keep only the information we defined at root of the function
                     if title in valid_name:
                         metadata[str(title)] = text
 
-        # Statistical information
+        # Statistical information (Additional information on statistical characteristics)
         app_mapping = {
             'TotalTime': 'Edit Time (minutes)',
             'Pages': 'Page Count',
@@ -89,6 +98,7 @@ def msoffice_metadata(path):
             'Notes': 'Note Count',
             'HiddenSlides': 'Hidden Slide Count',
         }
+        # Same process as above in parallel metadata node containing file statistics
         for element in app_xml.getchildren():
             for key, title in app_mapping.items():
                 if key in element.tag:
@@ -104,21 +114,30 @@ def msoffice_metadata(path):
 
 
 def pdf_metadata(path):
+    # Function to retrieve PDF metadata when available
+    # Initialize dictionary to contain metadata
     metadata = {}
     fp = open(path, 'rb')
+    # initialize PDFParser to extract metadata
     parser = PDFParser(fp)
     doc = PDFDocument(parser)
+    # Long series of exceptions handling in case of wierd text conversion from PDFParser
     try:
         metadata['Title'] = decoder(doc.info[0]["Title"])
+    # If not recognized as text, resolve with built in function resolve1()
     except AttributeError:
         title = decoder(resolve1(doc.info[0]["Title"]))
+        # Element retrieved is not null, attribute to metadata key
         if title:
             metadata['Title'] = title
+        # Otherwise use simple naïve method
         else:
             metadata['Title'] = os.path.basename(path)
+    # If not element corresponds to title in metadata use simple naïve method
     except KeyError:
         metadata['Title'] = os.path.basename(path)
 
+    # Same exception handling as above
     try:
         metadata['Author(s)'] = decoder(doc.info[0]["Author"])
     except AttributeError:
@@ -130,6 +149,7 @@ def pdf_metadata(path):
     except KeyError:
         metadata["Author(s)"] = "Unknown"
 
+    # Same exception handling as above
     try:
         metadata['Last Modified By'] = decoder(doc.info[0]["Author"])
     except AttributeError:
@@ -141,6 +161,7 @@ def pdf_metadata(path):
     except KeyError:
         metadata['Last Modified By'] = "Unknown"
 
+    # Same exception handling as above
     try:
         metadata['Created Date'] = posix_from_s(decoder(doc.info[0]["CreationDate"]))
     except AttributeError:
@@ -152,6 +173,7 @@ def pdf_metadata(path):
     except KeyError:
         metadata['Created Date'] = "Unknown"
 
+    # Same exception handling as above, however use posix correction function defined at root of script
     try:
         metadata['Modified Date'] = posix_from_s(decoder(doc.info[0]["ModDate"]))
     except AttributeError:
@@ -167,6 +189,8 @@ def pdf_metadata(path):
 
 
 def misc_metadata(path):
+    # General purpose function to retrieve elementary metadata from files other than MSOffice & PDF (mainly
+    # creation & modification date)
     metadata = {}
     metadata['Title'] = os.path.basename(path)
     metadata['Author(s)'] = "Unknown"
@@ -178,6 +202,7 @@ def misc_metadata(path):
 
 
 def get_meta(path):
+    # Function calling all others depending on file type
     MSoffice = [".pptx", ".ppt", ".docx", ".xls", ".xlsx"]
     filename = os.path.basename(path)
     if filename.endswith('.pdf'):
@@ -186,4 +211,5 @@ def get_meta(path):
         temp = msoffice_metadata(path)
     else:
         temp = misc_metadata(path)
+    # temp is a dictionary containing all metadata this program was able to retrieve
     return temp

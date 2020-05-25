@@ -5,6 +5,8 @@ from datetime import datetime
 
 
 def get_arbo(root):
+    # General purpose function to walk through all dir/nested dirs contained within specified root. Will append to a
+    # list of file paths a file location if the file type is handled by this program
     valid_ext = [
         "ppt", "pptx", "docx", "xlsx", "xls",
         "pdf",
@@ -21,6 +23,7 @@ def get_arbo(root):
 
 
 def validateJSON(jsonData):
+    # Json compatible python object checker/test function
     try:
         json.loads(jsonData)
     except ValueError:
@@ -29,6 +32,7 @@ def validateJSON(jsonData):
 
 
 class DateTimeEncoder(json.JSONEncoder):
+    # JSON encoder to overwrite default encoder in case of incompatible datetime format
     def default(self, o):
         if isinstance(o, datetime):
             return o.isoformat()
@@ -37,12 +41,14 @@ class DateTimeEncoder(json.JSONEncoder):
 
 
 def jsonKeys2int(x):
+    # Function to convert json keys from string to integers for server-side querying easing
     if isinstance(x, dict):
         return {int(k): v for k, v in x.items()}
     return x
 
 
 def to_json(dic, file_name="metadata.json"):
+    # Function to save python object as a json
     js = json.dumps(dic, indent=1, default=str)
 
     # Open new json file if not exist it will create
@@ -56,6 +62,8 @@ def to_json(dic, file_name="metadata.json"):
 
 
 def dic_for_viz(final_dic):
+    # Function to generate a dictionary that can be later process by other python methods (meant for visualization
+    # purposes)
     collection = {}
     index = 1
     for doc, meta in final_dic.items():
@@ -70,6 +78,7 @@ def dic_for_viz(final_dic):
 
 
 def meta_to_df(final_dic, save=False):
+    # Function to specifically convert metadata retrieved to csv for visualization purposes
     df = pd.DataFrame(dic_for_viz(final_dic))
     df = df.T
     if save:

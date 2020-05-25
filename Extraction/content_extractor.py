@@ -1,3 +1,5 @@
+# Script containing all the programs to extract text, images, tables from a variety of file types
+
 import re
 import os
 import cv2
@@ -26,21 +28,32 @@ TEXT = WORD_NAMESPACE + 't'
 
 
 def docx_extractor(path, vectors=False):
+    # Function to extract content from docx files, takes path input if path endswith .docx
+    # Start by reading MSoffice zipfile
     document = zipfile.ZipFile(path)
+    # Search in xml structure the location of content (here it's word/document.xml)
     xml_content = document.read('word/document.xml')
     document.close()
+    # Generate xml tree structure from content location
     tree = XML(xml_content)
+    # Initialize dictionary to contain content and index per paragraph
     doc = {}
+    # Initialize string to contain concatenated text from document for nlp purposes
     s = ''
     # vector = {}
     paragraph_nb = 1
+    # Iterate through all elements of the xml tree
     for paragraph in tree.getiterator(PARA):
+        # Append to list if node in tree contains non-null text
         texts = [node.text
                  for node in paragraph.getiterator(TEXT)
                  if node.text]
         if texts:
+            # Concatenate non null text contained in previous list
             text = ''.join(texts)
+            # Index concatenated string to paragtaph number
             doc[str(paragraph_nb)] = fix_text(text)
+            # Append concatenated string to current string (for nlp)
             s += fix_text(text)
 #            if vectors:
 #                vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
@@ -50,28 +63,33 @@ def docx_extractor(path, vectors=False):
 
 #    if vectors:
 #        return creator, doc, vector
-    else:
-        return doc, s
+#    else:
+    return doc, s
 
 
 def ppt_extractor(path):
+    # Initialize dictionary to contain content of pptx per slide
     paragraph_repo = {}
     # vector = {}
     f = open(path, "rb")
+    # Use Presentation module from python-pptx to process content
     prs = Presentation(f)
     slide_nb = 0
+    # Initialize string to contain concatenated text from document for nlp purposes
     s = ''
     for slide in prs.slides:
 
         slide_nb += 1
+        # Initialize temporary text container
         temp_text = ''
 
         for shape in slide.shapes:
-
+            # If string is not null and is text, append to temporary text container
             if hasattr(shape, "text") and shape.text.strip():
                 temp_text += shape.text
-
+        # Once all text has been retrieved from slide attribute it to page nb index inside initialized dictionary
         paragraph_repo[str(slide_nb)] = fix_text(temp_text)
+        # append concatenated string to initialized string for nlp purposes
         s += fix_text(temp_text)
         # if vectors:
         #     vector[str(slide_nb)] = vectorizer(temp_text, lang=detect(text))
@@ -85,17 +103,22 @@ def ppt_extractor(path):
 
 
 def txt_extractor(path):
+    # Initialize dictionary to contain all content of txt file
     doc = {}
     # vector = {}
     paragraph_nb = 1
+    # Initialize string to contain all concatenated text from txt file
     s = ""
 
     with open(path) as f:
         lines = f.read()
 
+    # Split document at line jumps
     texts = lines.strip().split("/n/n")
     for text in texts:
+        # Append text to line index
         doc[str(paragraph_nb)] = fix_text(text)
+        # Append concatenated string to intialized string for nlp purposes
         s += fix_text(text)
         # if vectors:
         #     vector[str(paragraph_nb)] = vectorizer(text, lang=detect(text))
@@ -109,30 +132,40 @@ def txt_extractor(path):
 
 
 def pdf_extractor(path):
+    # Initialize PDFResourceManager to go through content of PDF
     rsrcmgr = PDFResourceManager()
     retstr = StringIO()
     laparams = LAParams()
+    # Initialize TextConverter method to convert PDF data to text
     device = TextConverter(rsrcmgr, retstr, laparams=laparams)
     fp = open(path, 'rb')
     interpreter = PDFPageInterpreter(rsrcmgr, device)
+    # Password may be required to open PDF
     password = ""
     maxpages = 0
     caching = True
     pagenos = set()
     current_page_number = 1
+    # Initialize dictionary to contain content of PDF indexed per page
     paragraph_repo = {}
     # vector = {}
+    # Initialize string to contain all concatenated text for further nlp processing
     s = ''
 
+    # Loop through every page the PDFResourceManager has identified with listed options above
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
+        # Temporary text container to avoid overwriting or repetitions
         text = ''
         interpreter.process_page(page)
-
+        # Get text value
         text = retstr.getvalue()
         retstr.truncate(0)
+        # Fix potential encoding error
         text = re.sub(u'(\u0000)', "", text)
+        # Attribute retrieved text to current page number in intialized dictionary
         paragraph_repo[str(current_page_number)] = fix_text(text)
+        # Append concatenated string to initialized string for nlp
         s += fix_text(text)
         # if vectors:
         #     vector[str(current_page_number)] = vectorizer(text, lang=detect(text))
@@ -150,50 +183,68 @@ def pdf_extractor(path):
 
 
 def img_extractor(path):
+    # initialize dictionary to contain image contents
     dic = {}
+    # Read image
     img = cv2.imread(path)
+    # Attempt to convert image to string in case of a scanned document non registred as a PDF
     scan = pytesseract.image_to_string(img)
+    # Text obtained contains a certain amount of characters, consider it a scan
     if scan or len(scan) > 20:
         dic["scanned_document"] = scan
+    # Otherwise consider it as a photo from which we can not extract its content (look out for summarization script)
     else:
         dic["photo"] = "Content of this photo to be classified"
-
+    # Return dictionnary and raw img content for Object Detection purposes
     return dic, img
 
 
 def excel_extractor(path):
+    # Initialize dictionary to contain content of every potential sheet within an excel spreadsheet
     Dic = {}
     filename = os.path.basename(path)
+    # Verify it is indeed an excel file
     if filename.endswith(".xlsx") or filename.endswith(".xls"):
         table = pd.read_excel(path, sheet_name=None)
+        # For every sheet, replace NaN value by null to avoid parsing errors in JSON format
+        # Rearrange content of sheets in record-style dictionaries
         for k in table.keys():
             table[k] = table[k].replace({np.nan: None})
             Dic[k] = table[k].to_dict(orient='records')
-
+    # Return dictionary and raw table for table charasterics extraction
     return Dic, table
 
 
 def table_extractor(path):
+    # Initialize dictionary to contain contents of any type of table except excel
     Dic = {}
     filename = os.path.basename(path)
+    # For csv's and tsv's use pandas method
     if filename.endswith("csv") or filename.endswith("tsv"):
         table = pd.read_csv(path, encoding='utf-8')
+        # Fix a posteriori index_col initialization problem when using pandas method
         if table.columns[0] == 'Unnamed: 0':
             del table['Unnamed: 0']
+        # replace NaN value by null to avoid parsing errors in JSON format
         table = table.replace({np.nan: None})
-        Dic["single_table"] = table.to_dict('index')
+        # Rearrange content of table in record-style dictionaries
+        Dic["single_table"] = table.to_dict(orient='records')
+    # For other table formats use slower more general purpose pandas method
     else:
         table = pd.read_table(path)
+        # Same process as above
         if table.columns[0] == 'Unnamed: 0':
             del table['Unnamed: 0']
         table = table.replace({np.nan: None})
         Dic["single_table"] = table
-
+    # Return dictionary and raw table for table charasterics extraction
     return Dic, table
 
 
 def scan_extractor(path):
+    # Initialize dictionary to contain contents of scanned document that PDFResourceManager failed to handle
     paragraph_repo = {}
+    # Initialize string to contain concatenated string for nlp purposes
     s = ''
     # Store all the pages of the PDF in a variable
     pages = convert_from_path(path, 500)
@@ -258,6 +309,10 @@ def scan_extractor(path):
 
 
 def get_content(path):
+    """
+    General purpose function to handle content extraction based on file type.
+    Will call one of the above functions.
+    """
     text = {}
     print(path)
     if path.endswith(".pptx") or path.endswith(".ppt"):
