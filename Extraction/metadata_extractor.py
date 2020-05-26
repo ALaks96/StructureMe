@@ -2,6 +2,7 @@ import os
 import re
 import time
 import zipfile
+
 try:
     from xml.etree.cElementTree import XML
 except ImportError:
@@ -191,12 +192,11 @@ def pdf_metadata(path):
 def misc_metadata(path):
     # General purpose function to retrieve elementary metadata from files other than MSOffice & PDF (mainly
     # creation & modification date)
-    metadata = {}
-    metadata['Title'] = os.path.basename(path)
-    metadata['Author(s)'] = "Unknown"
-    metadata['Last Modified By'] = "Unknown"
-    metadata['Created Date'] = time.ctime(os.path.getmtime(path))
-    metadata['Modified Date'] = time.ctime(os.path.getctime(path))
+    metadata = {'Title': os.path.basename(path),
+                'Author(s)': "Unknown",
+                'Last Modified By': "Unknown",
+                'Created Date': time.ctime(os.path.getmtime(path)),
+                'Modified Date': time.ctime(os.path.getctime(path))}
 
     return metadata
 

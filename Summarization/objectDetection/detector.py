@@ -15,6 +15,7 @@ def image_detect(path, detector=None):
     for eachItem in detection:
         # For each element identified, attribute it a key as the name of the element and value the percentage probaility
         # that it is that element
-        summ[str("element " + str(i) + " " + str(eachItem["name"]))] = str(round(eachItem["percentage_probability"])) + "%"
+        summ[str("element " + str(i) + " " + str(eachItem["name"]))] = str(round(eachItem["percentage_probability"])) \
+                                                                       + "%"
         i += 1
     return summ

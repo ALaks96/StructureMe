@@ -47,7 +47,8 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
             print("Got content")
             # Call summarize() function which will apply appropriate method to summarize the content retrieved above.
             # We pass the different models as parameters to avoid loading them every time
-            dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr, filepath=file, detector=model_detector)
+            dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr, filepath=file,
+                                                detector=model_detector)
             print("-----------------------")
             print("Got summary")
             # And assign all of this to our mega dictionary indexed by incremental numbers!

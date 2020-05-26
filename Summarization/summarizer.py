@@ -62,7 +62,7 @@ def summarize(raw, file_type, model_en, model_fr, filepath, detector):
         summ["text_contents"] = text_summary(raw, model_en, model_fr)
     # In case the case of an image, we call the summarization function from the objectDetection sub folder
     elif file_type == 'img':
-        summ["photo_subjects"] = image_detect(filepath,detector)
+        summ["photo_subjects"] = image_detect(filepath, detector)
     elif file_type == "sheets":
         for k in raw.keys():
             summ[k] = table_summary(raw[k])
