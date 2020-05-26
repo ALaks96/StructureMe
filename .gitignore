@@ -136,27 +136,7 @@ dmypy.json
 .idea/workspace.xml
 Data/*
 !Data/.gitkeep
-Output/
-Troubleshooting/Attestation sur l'honneur.jpeg
-Troubleshooting/Attestation sur l'honneur.pdf
-Troubleshooting/Attestation_Modalite_exams.pdf
-Troubleshooting/BUDGET.xlsx
-Troubleshooting/CV Alexis Laks.docx
-Troubleshooting/Case 3 - Pricing Strategy - Dataset.xlsx
-Troubleshooting/ID.jpeg
-Troubleshooting/Rapport de Stage.pdf
-Troubleshooting/case3_data.csv
-Troubleshooting/cv_alexis_laks.pdf
-Troubleshooting/ethics&data_alexis_laks.docx
-Troubleshooting/out_text.txt
-Troubleshooting/page_1.jpg
-Troubleshooting/scan.json
-Troubleshooting/some_sub_dir/Attestation_Modalite_exams.pdf
-Troubleshooting/some_sub_dir/CV Alexis Laks.docx
-Troubleshooting/some_sub_dir/Rapport de Stage.pdf
-Troubleshooting/some_sub_dir/cv_alexis_laks.pdf
-Troubleshooting/some_sub_dir/ethics&data_alexis_laks.docx
-Troubleshooting/test.jpeg
-Troubleshooting/troubleshooter.ipynb
-page_1.jpg
+Output/*
+!Output/.gitkeep
+Troubleshooting/*
 .idea
