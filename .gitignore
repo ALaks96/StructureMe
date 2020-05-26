@@ -134,21 +134,8 @@ dmypy.json
 .idea/misc.xml
 .idea/modules.xml
 .idea/workspace.xml
-Data/1030_conservationdog-1028x579.png
-Data/Attestation sur l'honneur.pdf
-Data/BCG.docx
-Data/BUDGET.xlsx
-Data/Case 3 - Pricing Strategy - Dataset.xlsx
-Data/case3_data.csv
-Data/images.jpg
-Data/photo.png
-Data/some_sub_dir/Attestation_Modalite_exams.pdf
-Data/some_sub_dir/CV Alexis Laks.docx
-Data/some_sub_dir/Masterclass DISummit 1 hour.pptx
-Data/some_sub_dir/Rapport de Stage.pdf
-Data/some_sub_dir/cv_alexis_laks.pdf
-Data/some_sub_dir/ethics&data_alexis_laks.docx
-Data/test.txt
+Data/*
+!Data/.gitkeep
 Output/
 Troubleshooting/Attestation sur l'honneur.jpeg
 Troubleshooting/Attestation sur l'honneur.pdf
