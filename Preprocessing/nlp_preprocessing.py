@@ -50,6 +50,7 @@ def clean_text(text):
 
     return text
 
+
 def preprocessing(text):
 
     stopword_list, lemmatizer, transformation_sc_dict = requirements()

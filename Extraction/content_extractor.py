@@ -1,5 +1,4 @@
 # Script containing all the programs to extract text, images, tables from a variety of file types
-
 import re
 import os
 import cv2
@@ -8,7 +7,6 @@ import pytesseract
 import numpy as np
 import pandas as pd
 from PIL import Image
-
 try:
     from xml.etree.cElementTree import XML
 except ImportError:
@@ -18,7 +16,6 @@ from pptx import Presentation
 from pdfminer.pdfpage import PDFPage
 from pdfminer.layout import LAParams
 from pdf2image import convert_from_path
-from pytesseract import image_to_string
 from Preprocessing.beautify import fix_text
 from pdfminer.converter import TextConverter
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -27,7 +24,7 @@ PARA = WORD_NAMESPACE + 'p'
 TEXT = WORD_NAMESPACE + 't'
 
 
-def docx_extractor(path, vectors=False):
+def docxExtractor(path):
     # Function to extract content from docx files, takes path input if path endswith .docx
     # Start by reading MSoffice zipfile
     document = zipfile.ZipFile(path)
@@ -155,8 +152,6 @@ def pdf_extractor(path):
     # Loop through every page the PDFResourceManager has identified with listed options above
     for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password, caching=caching,
                                   check_extractable=True):
-        # Temporary text container to avoid overwriting or repetitions
-        text = ''
         interpreter.process_page(page)
         # Get text value
         text = retstr.getvalue()
@@ -201,7 +196,7 @@ def img_extractor(path):
 
 def excel_extractor(path):
     # Initialize dictionary to contain content of every potential sheet within an excel spreadsheet
-    Dic = {}
+    dic = {}
     filename = os.path.basename(path)
     # Verify it is indeed an excel file
     if filename.endswith(".xlsx") or filename.endswith(".xls"):
@@ -210,14 +205,16 @@ def excel_extractor(path):
         # Rearrange content of sheets in record-style dictionaries
         for k in table.keys():
             table[k] = table[k].replace({np.nan: None})
-            Dic[k] = table[k].to_dict(orient='records')
-    # Return dictionary and raw table for table charasterics extraction
-    return Dic, table
+            dic[k] = table[k].to_dict(orient='records')
+    # Return dictionary and raw table for table characteristics extraction
+        return dic, table
+    else:
+        return table_extractor(path)
 
 
 def table_extractor(path):
     # Initialize dictionary to contain contents of any type of table except excel
-    Dic = {}
+    dic = {}
     filename = os.path.basename(path)
     # For csv's and tsv's use pandas method
     if filename.endswith("csv") or filename.endswith("tsv"):
@@ -228,7 +225,7 @@ def table_extractor(path):
         # replace NaN value by null to avoid parsing errors in JSON format
         table = table.replace({np.nan: None})
         # Rearrange content of table in record-style dictionaries
-        Dic["single_table"] = table.to_dict(orient='records')
+        dic["single_table"] = table.to_dict(orient='records')
     # For other table formats use slower more general purpose pandas method
     else:
         table = pd.read_table(path)
@@ -236,9 +233,9 @@ def table_extractor(path):
         if table.columns[0] == 'Unnamed: 0':
             del table['Unnamed: 0']
         table = table.replace({np.nan: None})
-        Dic["single_table"] = table
-    # Return dictionary and raw table for table charasterics extraction
-    return Dic, table
+        dic["single_table"] = table
+    # Return dictionary and raw table for table characteristics extraction
+    return dic, table
 
 
 def scan_extractor(path):
@@ -287,7 +284,7 @@ def scan_extractor(path):
         filename = "page_" + str(i) + ".jpg"
 
         # Recognize the text as string in image using pytesserct
-        text = str(((pytesseract.image_to_string(Image.open(filename)))))
+        text = str((pytesseract.image_to_string(Image.open(filename))))
 
         # The recognized text is stored in variable text
         # Any string processing may be applied on text
@@ -314,7 +311,7 @@ def get_content(path):
     Will call one of the above functions.
     """
     text = {}
-    print(path)
+    global raw, file_type
     if path.endswith(".pptx") or path.endswith(".ppt"):
         # try:
         text, raw = ppt_extractor(path)
@@ -341,7 +338,7 @@ def get_content(path):
     elif path.endswith(".docx"):
 
         # try:
-        text, raw = docx_extractor(path)
+        text, raw = docxExtractor(path)
         file_type = "txt"
         # except Exception as e:
         #     print(e)
