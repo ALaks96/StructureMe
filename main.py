@@ -29,10 +29,13 @@ except Exception as e:
     print("You need to download a model for object detection such as TinyYOLOV3")
 
 # check if user has passed a location as parameter, otherwise fetch in Data folder
-if sys.argv[1]:
-    root = sys.argv[1]
-else:
-    # Define root as location where program is installed
+try:
+    if sys.argv[1]:
+        root = sys.argv[1]
+    else:
+        # Define root as location where program is installed
+        root = os.getcwd() + "/Data/"
+except IndexError:
     root = os.getcwd() + "/Data/"
 # Launch program
 structure_me(root, en=nlp_en, fr=nlp_fr, model_detector=detector)

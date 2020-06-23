@@ -28,6 +28,12 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
             # Initiate same key dic to be completed every time with metadata keys, content key, summary key
             dic_of_files = {}
 
+            # Call get_content() function which will use appropriate method to extract content from file depending on
+            # its type
+            dic_of_files['content'], raw, file_type = get_content(file)
+            print("-----------------------")
+            print("Got content")
+
             # Get metadata of file, get_meta() will call appropriate function depending on the extension given
             meta = get_meta(file)
             print("-----------------------")
@@ -40,11 +46,6 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
             dic_of_files['modified_date'] = meta['Modified Date']
             dic_of_files['location'] = file
 
-            # Call get_content() function which will use appropriate method to extract content from file depending on
-            # its type
-            dic_of_files['content'], raw, file_type = get_content(file)
-            print("-----------------------")
-            print("Got content")
             # Call summarize() function which will apply appropriate method to summarize the content retrieved above.
             # We pass the different models as parameters to avoid loading them every time
             dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr, filepath=file,

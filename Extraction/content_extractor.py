@@ -178,6 +178,8 @@ def pdf_extractor(path):
 
 
 def img_extractor(path):
+    # Initialize empty text for classification in the potential case of a scanned text document in photo format
+    text = ""
     # initialize dictionary to contain image contents
     dic = {}
     # Read image
@@ -186,12 +188,13 @@ def img_extractor(path):
     scan = pytesseract.image_to_string(img)
     # Text obtained contains a certain amount of characters, consider it a scan
     if scan or len(scan) > 20:
-        dic["scanned_document"] = scan
+        dic["scanned_document"], text = scan_extractor(path)
     # Otherwise consider it as a photo from which we can not extract its content (look out for summarization script)
     else:
-        dic["photo"] = "Content of this photo to be classified"
+        image = Image.open(path)
+        dic["photo"] = np.array(image).tolist()
     # Return dictionnary and raw img content for Object Detection purposes
-    return dic, img
+    return dic, img, text
 
 
 def excel_extractor(path):
@@ -312,6 +315,9 @@ def get_content(path):
     """
     text = {}
     global raw, file_type
+    # Special case handling when file is in image format but corresponds to text
+    img_text = ""
+    exception = ""
     if path.endswith(".pptx") or path.endswith(".ppt"):
         # try:
         text, raw = ppt_extractor(path)
@@ -357,8 +363,12 @@ def get_content(path):
             or path.endswith(".jpeg") \
             or path.endswith(".jpg"):
 
-        text, raw = img_extractor(path)
-        file_type = "img"
+        # extra output to control for scanned text documents in img format
+        text, raw, img_type = img_extractor(path)
+        if img_type:
+            file_type = "txt"
+        else:
+            file_type = "img"
 
     elif path.endswith(".tsv") \
             or path.endswith(".csv"):
