@@ -2,7 +2,8 @@ import os
 import re
 import time
 import zipfile
-
+from PIL import Image
+from PIL.ExifTags import TAGS
 try:
     from xml.etree.cElementTree import XML
 except ImportError:
@@ -199,6 +200,23 @@ def misc_metadata(path):
                 'Modified Date': time.ctime(os.path.getctime(path))}
 
     return metadata
+
+
+def get_exif(path):
+    exifs = {}
+    image = Image.open(path)
+    exifdata = image.getexif()
+    # iterating over all EXIF data fields
+    for tag_id in exifdata:
+        # get the tag name, instead of human unreadable tag id
+        tag = TAGS.get(tag_id, tag_id)
+        data = exifdata.get(tag_id)
+        # decode bytes
+        if isinstance(data, bytes):
+            data = data.decode()
+    exifs['tags'] = dict(data)
+
+    return exifs
 
 
 def get_meta(path):

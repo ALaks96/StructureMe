@@ -1,7 +1,44 @@
-import pandas as pd
+import torch
 import pytextrank
+import pandas as pd
 from langdetect import detect
 from Summarization.objectDetection.detector import image_detect
+
+
+def adv_text_summary(text, model_t5, tokenizer_t5):
+    summ = {}
+    device = torch.device('cpu')
+    # Detect language to know if translation is needed
+    if detect(text) != 'en':
+        t5_prepared_Text = "translate French to English: " + text
+        tokenized_text = tokenizer_t5.encode(t5_prepared_Text, return_tensors="pt").to(device)
+        #
+        translated_text = model_t5.generate(tokenized_text,
+                                     num_beams=4,
+                                     no_repeat_ngram_size=2,
+                                     min_length=30,
+                                     max_length=100,
+                                     early_stopping=True)
+
+        text = tokenizer_t5.decode(translated_text[0], skip_special_tokens=True)
+
+    # Proceed to text summarization
+    t5_prepared_Text = "summarize: " + text
+
+    tokenized_text = tokenizer_t5.encode(t5_prepared_Text, return_tensors="pt").to(device)
+
+    # summmarize
+    summary_ids = model_t5.generate(tokenized_text,
+                                 num_beams=4,
+                                 no_repeat_ngram_size=2,
+                                 min_length=30,
+                                 max_length=100,
+                                 early_stopping=True)
+
+    output = tokenizer_t5.decode(summary_ids[0], skip_special_tokens=True)
+    summ['summary'] = output
+
+    return summ
 
 
 def text_summary(text, model_en, model_fr):
@@ -55,11 +92,14 @@ def table_summary(table):
     return summ
 
 
-def summarize(raw, file_type, model_en, model_fr, filepath, detector):
+def summarize(raw, file_type, model_en, model_fr, filepath, detector, t5, model_t5, tokenizer_t5):
     # General purpose function to summarize content of file considered base on file type
     summ = {}
     if file_type == 'txt':
-        summ["text_contents"] = text_summary(raw, model_en, model_fr)
+        if t5:
+            summ["text_contents"] = adv_text_summary(raw, model_t5, tokenizer_t5)
+        else:
+            summ["text_contents"] = text_summary(raw, model_en, model_fr)
     # In case the case of an image, we call the summarization function from the objectDetection sub folder
     elif file_type == 'img':
         summ["photo_subjects"] = image_detect(filepath, detector)

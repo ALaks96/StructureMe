@@ -6,7 +6,8 @@ from Formatting.formatter import to_json
 from Summarization.summarizer import summarize
 
 
-def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None, model_detector=None):
+def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None, model_detector=None,
+                 inp_t5=None, inp_model_t5=None, inp_tokenizer_t5=None):
     # Function which calls all other functionalities to extract all necessary data from each file
     print("#####################")
     print("SCAN STARTED")
@@ -49,7 +50,8 @@ def structure_me(path, save=True, json_name="Output/scan.json", en=None, fr=None
             # Call summarize() function which will apply appropriate method to summarize the content retrieved above.
             # We pass the different models as parameters to avoid loading them every time
             dic_of_files['summary'] = summarize(raw, file_type, model_en=en, model_fr=fr, filepath=file,
-                                                detector=model_detector)
+                                                detector=model_detector, t5=inp_t5, model_t5=inp_model_t5,
+                                                tokenizer_t5=inp_tokenizer_t5)
             print("-----------------------")
             print("Got summary")
             # And assign all of this to our mega dictionary indexed by incremental numbers!
