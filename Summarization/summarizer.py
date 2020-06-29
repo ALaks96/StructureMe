@@ -9,10 +9,10 @@ def adv_text_summary(text, model_t5, tokenizer_t5):
     summ = {}
     device = torch.device('cpu')
     # Detect language to know if translation is needed
+    new_text = ""
     if detect(text) != 'en':
         t5_prepared_Text = "translate French to English: " + text
         tokenized_text = tokenizer_t5.encode(t5_prepared_Text, return_tensors="pt").to(device)
-        #
         translated_text = model_t5.generate(tokenized_text,
                                      num_beams=4,
                                      no_repeat_ngram_size=2,
@@ -20,12 +20,15 @@ def adv_text_summary(text, model_t5, tokenizer_t5):
                                      max_length=100,
                                      early_stopping=True)
 
-        text = tokenizer_t5.decode(translated_text[0], skip_special_tokens=True)
+        new_text = tokenizer_t5.decode(translated_text[0], skip_special_tokens=True)
+        print(new_text)
 
     # Proceed to text summarization
-    t5_prepared_Text = "summarize: " + text
-
-    tokenized_text = tokenizer_t5.encode(t5_prepared_Text, return_tensors="pt").to(device)
+    if new_text:
+        new_t5_prepared_Text = "summarize: " + new_text
+    else:
+        new_t5_prepared_Text = "summarize: " + text
+    tokenized_text = tokenizer_t5.encode(new_t5_prepared_Text, return_tensors="pt").to(device)
 
     # summmarize
     summary_ids = model_t5.generate(tokenized_text,
