@@ -26,6 +26,22 @@ if len(sys.argv) == 1:
 
 else:
     t5 = sys.argv[1]
+    ans = input('Have you been to https://www.cloudmersive.com/nlp-api to create your API key? yes/no answers only')
+    if ans == "yes":
+        API_KEY = input("Please enter your API key here:")
+    else:
+        t5 = None
+        print("If you want to use T5 you need to get an API key, visit https://www.cloudmersive.com/nlp-api to create"
+              "one, it's free! Using Spacy models and graph approach instead.")
+        try:
+            nlp_fr = spacy.load('fr_core_news_sm')
+        except OSError:
+            print("run this in your terminal: python -m spacy download fr_core_news_sm")
+
+        try:
+            nlp_en = spacy.load("en_core_web_sm")
+        except OSError:
+            print("run this in your terminal: python -m spacy download en_core_web_sm")
     model_t5 = T5ForConditionalGeneration.from_pretrained('t5-small')
     tokenizer_t5 = T5Tokenizer.from_pretrained('t5-small')
 
@@ -53,4 +69,4 @@ except Exception as e:
 root = os.getcwd() + "/Data/"
 # Launch program
 structure_me(root, en=nlp_en, fr=nlp_fr, model_detector=detector, inp_t5=t5, inp_model_t5=model_t5,
-             inp_tokenizer_t5=tokenizer_t5)
+             inp_tokenizer_t5=tokenizer_t5, API_KEY=None)
