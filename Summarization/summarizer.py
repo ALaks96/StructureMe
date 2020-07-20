@@ -31,7 +31,7 @@ def adv_text_summary(text, model_t5, tokenizer_t5, APIKEY):
             api_response = api_instance.language_translation_translate_fra_to_eng(input)
         except ApiException as e:
             print("Exception when calling LanguageTranslationApi->language_translation_translate_fra_to_eng: %s\n" % e)
-        new_text = " ".join(api_response['translated_text_result'])
+        new_text = " ".join(api_response.translated_text_result)
 
     # Proceed to text summarization
     if new_text:
