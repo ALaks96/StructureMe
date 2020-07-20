@@ -5,13 +5,13 @@ The objective was to create a program that will scan all dirs/subdirs for text f
 elements in JSON format to allow query with a server with a nice front-end visual representation / webapp.
 Three main functions are offered by this program for a given file:
 
-- Extract all content (except if it's an image)
+- Extract all content 
 - Extract all metadata (at least what is available)
 - Summarize content (which varies depending on file type)
 
 For summarization the following three methods are considered: 
             
-**TEXT:** Topic extraction for text files using Spacy/Nltk
+**TEXT:** Topic extraction for text files using Spacy/Nltk OR cloudmersive API (to translate French to English) + Google T5 model 
 
 **IMAGE:** Object Detection for images using YOLO
 
@@ -27,6 +27,8 @@ the **Data** folder of the repo.
 # Running the program
 
 ```
+cd StructureMe
+source bin/activate
 python3 -m pip install -r requirements.txt
 python3 main.py /path/to/dir/you/want/to/structure/
 ```
