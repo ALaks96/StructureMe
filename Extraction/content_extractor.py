@@ -2,6 +2,7 @@
 import re
 import os
 import cv2
+import base64
 import zipfile
 import pytesseract
 import numpy as np
@@ -191,8 +192,8 @@ def img_extractor(path):
         dic["scanned_document"], text = scan_extractor(path)
     # Otherwise consider it as a photo from which we can not extract its content (look out for summarization script)
     else:
-        image = Image.open(path)
-        dic["photo"] = np.array(image).tolist()
+        with open(path, "rb") as image:
+            dic["photo"] = base64.b64encode(img_file.read()).decode('utf-8')
     # Return dictionnary and raw img content for Object Detection purposes
     return dic, img, text
 
