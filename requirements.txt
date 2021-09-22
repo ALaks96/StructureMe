@@ -17,7 +17,7 @@ cycler==0.10.0
 cymem==2.0.3
 Cython==0.29.19
 decorator==4.4.2
-Django==3.0.12
+Django==3.1.13
 docutils==0.15.2
 en-core-web-sm==2.2.0
 ez-setup==0.9
