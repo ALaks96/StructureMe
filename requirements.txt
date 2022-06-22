@@ -52,7 +52,7 @@ murmurhash==1.0.2
 networkx==2.4
 nltk==3.5
 nolearn==0.6.1
-numpy==1.18.2
+numpy==1.22.0
 oauthlib==3.1.0
 opencv-python==4.2.0.34
 opt-einsum==3.2.1
